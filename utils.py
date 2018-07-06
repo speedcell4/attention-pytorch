@@ -4,7 +4,8 @@ from more_itertools import islice_extended
 import torch
 
 __all__ = [
-    'cartesian_view'
+    'cartesian_view',
+    'expanded_masked_fill',
 ]
 
 
@@ -29,3 +30,20 @@ def cartesian_view(tensor1: torch.Tensor, tensor2: torch.Tensor,
     tensor1 = tensor1.view(*start1, *mid1, *end1).expand(*start1, *mid_common, *end1)
     tensor2 = tensor2.view(*start2, *mid2, *end2).expand(*start2, *mid_common, *end2)
     return tensor1, tensor2
+
+
+def expanded_masked_fill(tensor: torch.Tensor, mask: torch.ByteTensor,
+                         filling_value: float = -float('inf')) -> torch.Tensor:
+    """
+
+    Args:
+        tensor: (*batch, *nom1, nom2)
+        mask: (*batch, nom2)
+        filling_value: (,)
+
+    Returns:
+        (*batch, *nom1, nom2)
+    """
+    *batch, dim = mask.size()
+    mask = mask.view(*batch, *(1,) * (tensor.dim() - mask.dim()), dim).expand_as(tensor)
+    return tensor.masked_fill(mask, filling_value)

@@ -2,6 +2,7 @@ import torch
 from torch import nn
 
 from houttuynia.nn.init import keras_conv_
+from utils import expanded_masked_fill
 
 
 class GramConv1d(nn.Sequential):
@@ -39,6 +40,5 @@ class GramConv1d(nn.Sequential):
 
     def forward(self, inputs: torch.FloatTensor, mask: torch.ByteTensor = None) -> torch.FloatTensor:
         if mask is not None:
-            mask = ~mask.unsqueeze(1)
-            inputs = inputs.masked_fill_(mask, 0)
+            inputs = expanded_masked_fill(inputs, ~mask, filling_value=0.)
         return super(GramConv1d, self).forward(inputs)

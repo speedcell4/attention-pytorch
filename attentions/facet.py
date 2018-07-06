@@ -2,7 +2,8 @@ import torch
 from torch.nn import functional as F
 from torch import nn
 
-from attentions import Attention, expanded_masked_fill
+from attentions import Attention
+from utils import expanded_masked_fill
 
 
 class FacetAttention(Attention):
